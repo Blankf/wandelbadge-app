@@ -130,13 +130,19 @@
                                 <input type="number" id="kmInput" value="25" class="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-emerald-500 transition-all">
                             </div>
                             <div class="space-y-1">
+                                <label class="text-xs font-bold text-slate-400 uppercase">Doel (km)</label>
+                                <input type="number" id="targetInput" value="2026" class="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-emerald-500 transition-all">
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div class="space-y-1">
                                 <label class="text-xs font-bold text-slate-400 uppercase">Dag van uitdaging</label>
                                 <input type="number" id="dayInput" placeholder="Bijv. 12" class="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-emerald-500 transition-all">
                             </div>
-                        </div>
-                        <div class="space-y-1">
-                            <label class="text-xs font-bold text-slate-400 uppercase">Aantal stappen</label>
-                            <input type="number" id="stepsInput" placeholder="Bijv. 1250000" class="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-emerald-500 transition-all">
+                            <div class="space-y-1">
+                                <label class="text-xs font-bold text-slate-400 uppercase">Aantal stappen</label>
+                                <input type="number" id="stepsInput" placeholder="Bijv. 1250000" class="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-emerald-500 transition-all">
+                            </div>
                         </div>
                     </div>
 
@@ -210,6 +216,56 @@
                             </div>
                         </div>
 
+                        <!-- Kilometers Tekst Styling -->
+                        <div class="p-4 bg-slate-50 rounded-2xl border border-slate-100 space-y-4">
+                            <label class="text-xs font-bold text-slate-500 uppercase tracking-tighter">Kilometers Tekst Styling</label>
+                            <div class="space-y-3">
+                                <div class="flex flex-wrap gap-2">
+                                    <select onchange="setConfig('kmFont', this.value)" id="kmFontSelect" class="flex-1 bg-white border border-slate-200 rounded-lg px-2 py-1 text-xs outline-none">
+                                        <option value="Inter">Modern (Sans)</option>
+                                        <option value="'Noto Serif'">Klassiek (Serif)</option>
+                                        <option value="'Space Mono'">Tracker (Mono)</option>
+                                        <option value="'Quicksand'">Zacht (Rounded)</option>
+                                        <option value="'Caveat'">Handschrift</option>
+                                    </select>
+                                    <button onclick="toggleStyle('kmBold')" id="kmBoldBtn" class="style-btn w-10 h-10 border border-slate-200 rounded-lg font-bold bg-white text-xs transition-all active">B</button>
+                                    <button onclick="toggleStyle('kmItalic')" id="kmItalicBtn" class="style-btn w-10 h-10 border border-slate-200 rounded-lg italic bg-white text-xs transition-all">I</button>
+                                </div>
+                                <div class="space-y-1">
+                                    <div class="flex justify-between items-center">
+                                        <label class="text-xs font-bold text-slate-400 uppercase">Grootte Kilometers Tekst</label>
+                                        <span id="kmSizeLabel" class="text-xs font-bold text-emerald-600">85px</span>
+                                    </div>
+                                    <input type="range" id="kmSizeSlider" min="40" max="150" value="85" class="w-full rounded-lg appearance-none cursor-pointer">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Doel Tekst Styling -->
+                        <div class="p-4 bg-slate-50 rounded-2xl border border-slate-100 space-y-4">
+                            <label class="text-xs font-bold text-slate-500 uppercase tracking-tighter">Doel Tekst Styling</label>
+                            <div class="space-y-3">
+                                <div class="flex flex-wrap gap-2">
+                                    <select onchange="setConfig('goalFont', this.value)" id="goalFontSelect" class="flex-1 bg-white border border-slate-200 rounded-lg px-2 py-1 text-xs outline-none">
+                                        <option value="Inter">Modern (Sans)</option>
+                                        <option value="'Noto Serif'">Klassiek (Serif)</option>
+                                        <option value="'Space Mono'">Tracker (Mono)</option>
+                                        <option value="'Quicksand'">Zacht (Rounded)</option>
+                                        <option value="'Caveat'">Handschrift</option>
+                                    </select>
+                                    <button onclick="toggleStyle('goalBold')" id="goalBoldBtn" class="style-btn w-10 h-10 border border-slate-200 rounded-lg font-bold bg-white text-xs transition-all active">B</button>
+                                    <button onclick="toggleStyle('goalItalic')" id="goalItalicBtn" class="style-btn w-10 h-10 border border-slate-200 rounded-lg italic bg-white text-xs transition-all">I</button>
+                                </div>
+                                <div class="space-y-1">
+                                    <div class="flex justify-between items-center">
+                                        <label class="text-xs font-bold text-slate-400 uppercase">Grootte Doel Tekst</label>
+                                        <span id="goalSizeLabel" class="text-xs font-bold text-emerald-600">45px</span>
+                                    </div>
+                                    <input type="range" id="goalSizeSlider" min="20" max="80" value="45" class="w-full rounded-lg appearance-none cursor-pointer">
+                                </div>
+                            </div>
+                        </div>
+
                         <!-- 3. Instagram Handle -->
                         <div class="space-y-1 px-4">
                             <label class="text-xs font-bold text-slate-400 uppercase">Instagram @Handle</label>
@@ -253,8 +309,8 @@
                             </div>
                         </div>
 
-                        <!-- Icoontjes Groep -->
-                        <div class="p-4 bg-white rounded-2xl border border-slate-100 space-y-5">
+                        <!-- Hoofdicoon -->
+                        <div class="p-4 bg-white rounded-2xl border border-slate-100 space-y-3">
                             <div class="space-y-2">
                                 <label class="text-xs font-bold text-slate-400 uppercase">Hoofdicoon</label>
                                 <div class="flex flex-wrap gap-2">
@@ -263,17 +319,32 @@
                                     <button onclick="setConfig('icon', '🏔️')" class="p-3 text-2xl bg-slate-50 border border-slate-200 rounded-lg shadow-sm hover:bg-emerald-50 transition-all">🏔️</button>
                                     <button onclick="setConfig('icon', '🎒')" class="p-3 text-2xl bg-slate-50 border border-slate-200 rounded-lg shadow-sm hover:bg-emerald-50 transition-all">🎒</button>
                                     <button onclick="setConfig('icon', '👟')" class="p-3 text-2xl bg-slate-50 border border-slate-200 rounded-lg shadow-sm hover:bg-emerald-50 transition-all">👟</button>
+                                    <button onclick="setConfig('icon', '')" class="px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg shadow-sm text-xs font-bold text-slate-300 uppercase hover:bg-emerald-50 transition-all">Uit</button>
+                                </div>
+                                <div class="space-y-1 mt-3">
+                                    <div class="flex justify-between items-center">
+                                        <label class="text-xs font-bold text-slate-400 uppercase">Grootte Icoon</label>
+                                        <span id="iconSizeLabel" class="text-xs font-bold text-emerald-600">95px</span>
+                                    </div>
+                                    <input type="range" id="iconSizeSlider" min="40" max="180" value="95" class="w-full rounded-lg appearance-none cursor-pointer">
                                 </div>
                             </div>
+                        </div>
 
-                            <div class="grid grid-cols-2 gap-4 border-t pt-4 border-slate-100">
+                        <!-- Weer & Terrein -->
+                        <div class="p-4 bg-white rounded-2xl border border-slate-100">
+                            <div class="grid grid-cols-2 gap-4">
                                 <div class="space-y-2">
                                     <label class="text-xs font-bold text-slate-400 uppercase block">Weer</label>
                                     <div class="flex flex-wrap gap-1">
                                         <button onclick="setExtra('weather', '☀️')" class="p-2 text-xl bg-slate-50 border border-slate-100 rounded-md hover:bg-emerald-50 transition-all">☀️</button>
+                                        <button onclick="setExtra('weather', '⛅')" class="p-2 text-xl bg-slate-50 border border-slate-100 rounded-md hover:bg-emerald-50 transition-all">⛅</button>
                                         <button onclick="setExtra('weather', '☁️')" class="p-2 text-xl bg-slate-50 border border-slate-100 rounded-md hover:bg-emerald-50 transition-all">☁️</button>
                                         <button onclick="setExtra('weather', '🌧️')" class="p-2 text-xl bg-slate-50 border border-slate-100 rounded-md hover:bg-emerald-50 transition-all">🌧️</button>
-                                        <button onclick="setExtra('weather', '')" class="px-3 py-2 bg-slate-50 border border-slate-100 rounded-md text-xs font-bold text-slate-300 uppercase">Uit</button>
+                                        <button onclick="setExtra('weather', '⛈️')" class="p-2 text-xl bg-slate-50 border border-slate-100 rounded-md hover:bg-emerald-50 transition-all">⛈️</button>
+                                        <button onclick="setExtra('weather', '❄️')" class="p-2 text-xl bg-slate-50 border border-slate-100 rounded-md hover:bg-emerald-50 transition-all">❄️</button>
+                                        <button onclick="setExtra('weather', '🌫️')" class="p-2 text-xl bg-slate-50 border border-slate-100 rounded-md hover:bg-emerald-50 transition-all">🌫️</button>
+                                        <button onclick="setExtra('weather', '')" class="px-2 py-1 bg-slate-50 border border-slate-100 rounded-md text-[10px] font-bold text-slate-300 uppercase">Uit</button>
                                     </div>
                                 </div>
                                 <div class="space-y-2">
@@ -282,13 +353,17 @@
                                         <button onclick="setExtra('terrain', '🌲')" class="p-2 text-xl bg-slate-50 border border-slate-100 rounded-md hover:bg-emerald-50 transition-all">🌲</button>
                                         <button onclick="setExtra('terrain', '🏔️')" class="p-2 text-xl bg-slate-50 border border-slate-100 rounded-md hover:bg-emerald-50 transition-all">🏔️</button>
                                         <button onclick="setExtra('terrain', '🛣️')" class="p-2 text-xl bg-slate-50 border border-slate-100 rounded-md hover:bg-emerald-50 transition-all">🛣️</button>
-                                        <button onclick="setExtra('terrain', '')" class="px-3 py-2 bg-slate-50 border border-slate-100 rounded-md text-xs font-bold text-slate-300 uppercase">Uit</button>
+                                        <button onclick="setExtra('terrain', '🏞️')" class="p-2 text-xl bg-slate-50 border border-slate-100 rounded-md hover:bg-emerald-50 transition-all">🏞️</button>
+                                        <button onclick="setExtra('terrain', '🌳')" class="p-2 text-xl bg-slate-50 border border-slate-100 rounded-md hover:bg-emerald-50 transition-all">🌳</button>
+                                        <button onclick="setExtra('terrain', '⛰️')" class="p-2 text-xl bg-slate-50 border border-slate-100 rounded-md hover:bg-emerald-50 transition-all">⛰️</button>
+                                        <button onclick="setExtra('terrain', '🏕️')" class="p-2 text-xl bg-slate-50 border border-slate-100 rounded-md hover:bg-emerald-50 transition-all">🏕️</button>
+                                        <button onclick="setExtra('terrain', '')" class="px-2 py-1 bg-slate-50 border border-slate-100 rounded-md text-[10px] font-bold text-slate-300 uppercase">Uit</button>
                                     </div>
                                 </div>
                             </div>
                         </div>
 
-                        <div class="grid grid-cols-2 gap-4">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div class="space-y-2">
                                 <label class="text-xs font-bold text-slate-400 uppercase">Accentkleur</label>
                                 <div class="flex gap-2">
@@ -380,7 +455,7 @@
         }
 
         const DEFAULT_CONFIG = {
-            title: '#MyWalkingJourney',
+            title: 'WandelChallenge',
             showTitle: true,
             titleFont: 'Inter',
             titleSize: 52,
@@ -394,19 +469,29 @@
             yearSize: 180,
             showYear: true,
             km: 25,
+            kmFont: 'Inter',
+            kmSize: 85,
+            kmBold: true,
+            kmItalic: false,
             target: 2026,
             day: '',
             steps: '',
             handle: '',
             color: '#10b981',
             theme: 'light',
-            icon: '🥾',
+            icon: '',
+            iconSize: 95,
+            goalFont: 'Inter',
+            goalSize: 45,
+            goalBold: true,
+            goalItalic: false,
             opacity: 0.90,
-            showLogo: false,
+            showLogo: true,
             logoType: 'fightcancer',
             customLogoBase64: null,
             bgImage: null,
             customLogoImg: null,
+            fightCancerLogoImg: null,
             weather: '',
             terrain: '',
             wScale: 1.0,
@@ -419,10 +504,22 @@
         canvas.width = 1080;
         canvas.height = 1920;
 
+        // Load Fight Cancer logo
+        const fightCancerLogo = new Image();
+        fightCancerLogo.onload = () => {
+            config.fightCancerLogoImg = fightCancerLogo;
+            draw();
+        };
+        fightCancerLogo.onerror = () => {
+            console.warn('Failed to load Fight Cancer logo');
+        };
+        fightCancerLogo.src = 'fight_cancer_logo.png';
+
         function saveToCache() {
             const toSave = { ...config };
             delete toSave.bgImage;
             delete toSave.customLogoImg;
+            delete toSave.fightCancerLogoImg;
             localStorage.setItem(STORAGE_KEY, JSON.stringify(toSave));
         }
 
@@ -449,6 +546,7 @@
 
         function updateUIFromConfig() {
             document.getElementById('kmInput').value = config.km;
+            document.getElementById('targetInput').value = config.target || 2026;
             document.getElementById('dayInput').value = config.day || '';
             document.getElementById('stepsInput').value = config.steps || '';
             document.getElementById('titleInput').value = config.title;
@@ -477,8 +575,19 @@
             document.getElementById('titleSizeSlider').value = config.titleSize;
             document.getElementById('titleSizeLabel').innerText = `${config.titleSize}px`;
 
+            document.getElementById('iconSizeSlider').value = config.iconSize || 95;
+            document.getElementById('iconSizeLabel').innerText = `${config.iconSize || 95}px`;
+
+            document.getElementById('kmSizeSlider').value = config.kmSize || 85;
+            document.getElementById('kmSizeLabel').innerText = `${config.kmSize || 85}px`;
+
+            document.getElementById('goalSizeSlider').value = config.goalSize || 45;
+            document.getElementById('goalSizeLabel').innerText = `${config.goalSize || 45}px`;
+
             document.getElementById('titleFontSelect').value = config.titleFont;
             document.getElementById('yearFontSelect').value = config.yearFont;
+            document.getElementById('kmFontSelect').value = config.kmFont || 'Inter';
+            document.getElementById('goalFontSelect').value = config.goalFont || 'Inter';
             updateStyleButtons();
 
             if (config.customLogoBase64) {
@@ -525,6 +634,10 @@
             document.getElementById('titleItalicBtn').classList.toggle('active', config.titleItalic);
             document.getElementById('yearBoldBtn').classList.toggle('active', config.yearBold);
             document.getElementById('yearItalicBtn').classList.toggle('active', config.yearItalic);
+            document.getElementById('kmBoldBtn').classList.toggle('active', config.kmBold);
+            document.getElementById('kmItalicBtn').classList.toggle('active', config.kmItalic);
+            document.getElementById('goalBoldBtn').classList.toggle('active', config.goalBold);
+            document.getElementById('goalItalicBtn').classList.toggle('active', config.goalItalic);
         }
 
         function setExtra(key, val) {
@@ -550,11 +663,11 @@
             const fcBtn = document.getElementById('logo-fc');
             const customBtn = document.getElementById('logo-custom');
             if(type === 'fightcancer') {
-                fcBtn.className = "py-2 text-[10px] font-bold rounded-lg border-2 border-emerald-600 bg-white text-emerald-600";
-                customBtn.className = "py-2 text-[10px] font-bold rounded-lg border-2 border-slate-200 bg-white text-slate-400";
+                fcBtn.className = "py-3 text-xs font-bold rounded-lg border-2 border-emerald-600 bg-white text-emerald-600 transition-all";
+                customBtn.className = "py-3 text-xs font-bold rounded-lg border-2 border-slate-200 bg-white text-slate-400 hover:border-emerald-200 transition-all";
             } else if(type === 'custom') {
-                customBtn.className = "py-2 text-[10px] font-bold rounded-lg border-2 border-emerald-600 bg-white text-emerald-600";
-                fcBtn.className = "py-2 text-[10px] font-bold rounded-lg border-2 border-slate-200 bg-white text-slate-400";
+                customBtn.className = "py-3 text-xs font-bold rounded-lg border-2 border-emerald-600 bg-white text-emerald-600 transition-all";
+                fcBtn.className = "py-3 text-xs font-bold rounded-lg border-2 border-slate-200 bg-white text-slate-400 hover:border-emerald-200 transition-all";
             }
             draw(); saveToCache();
         }
@@ -575,6 +688,21 @@
         posSlider.addEventListener('input', (e) => { config.yPos = parseInt(e.target.value); updatePosLabel(config.yPos); draw(); saveToCache(); });
         yearSizeSlider.addEventListener('input', (e) => { config.yearSize = parseInt(e.target.value); yearSizeLabel.innerText = `${config.yearSize}px`; draw(); saveToCache(); });
         titleSizeSlider.addEventListener('input', (e) => { config.titleSize = parseInt(e.target.value); titleSizeLabel.innerText = `${config.titleSize}px`; draw(); saveToCache(); });
+        
+        const iconSizeSlider = document.getElementById('iconSizeSlider');
+        const iconSizeLabel = document.getElementById('iconSizeLabel');
+        iconSizeSlider.addEventListener('input', (e) => { config.iconSize = parseInt(e.target.value); iconSizeLabel.innerText = `${config.iconSize}px`; draw(); saveToCache(); });
+        
+        const goalSizeSlider = document.getElementById('goalSizeSlider');
+        const goalSizeLabel = document.getElementById('goalSizeLabel');
+        goalSizeSlider.addEventListener('input', (e) => { config.goalSize = parseInt(e.target.value); goalSizeLabel.innerText = `${config.goalSize}px`; draw(); saveToCache(); });
+
+        const kmSizeSlider = document.getElementById('kmSizeSlider');
+        const kmSizeLabel = document.getElementById('kmSizeLabel');
+        kmSizeSlider.addEventListener('input', (e) => { config.kmSize = parseInt(e.target.value); kmSizeLabel.innerText = `${config.kmSize}px`; draw(); saveToCache(); });
+
+        const kmFontSelect = document.getElementById('kmFontSelect');
+        kmFontSelect.addEventListener('change', (e) => { config.kmFont = e.target.value; draw(); saveToCache(); });
 
         document.querySelectorAll('input:not([type="file"]):not([type="range"]):not([type="checkbox"])').forEach(input => {
             input.addEventListener('input', (e) => {
@@ -674,9 +802,14 @@
             ctx.fillText(`${Math.round(perc * 100)}%`, wX + wW - 60, wY + 65);
             ctx.font = `700 ${20 * config.wScale}px Inter`; ctx.fillText('KLAAR', wX + wW - 60, wY + 105);
 
-            // Icon
-            ctx.font = `${95 * config.wScale}px Arial`; ctx.textAlign = 'center';
-            ctx.fillText(config.icon, canvas.width/2, wY + 130);
+            // Dynamic Y positioning based on icon presence
+            let contentStartY = config.icon ? wY + 130 : wY + 60;
+
+            // Icon (only if not empty)
+            if (config.icon) {
+                ctx.font = `${config.iconSize * config.wScale}px Arial`; ctx.textAlign = 'center';
+                ctx.fillText(config.icon, canvas.width/2, contentStartY);
+            }
 
             // Titel met Styling
             if (config.showTitle && config.title) {
@@ -685,7 +818,7 @@
                 ctx.textAlign = 'center';
 
                 const titleX = canvas.width / 2;
-                const titleY = wY + 220;
+                const titleY = config.icon ? wY + 220 : wY + 150;
                 ctx.fillText(config.title, titleX, titleY);
 
                 if (config.titleCheck) {
@@ -704,8 +837,11 @@
                 }
             }
 
-            // Bar
-            const bX = wX + (80 * config.wScale); const bY = wY + 310; const bW = wW - (160 * config.wScale); const bH = 55;
+            // Bar - position dynamically based on icon presence
+            const bX = wX + (80 * config.wScale); 
+            const bY = config.icon ? wY + 310 : wY + 240;
+            const bW = wW - (160 * config.wScale); 
+            const bH = 55;
             ctx.fillStyle = config.theme === 'light' ? '#f1f5f9' : '#334155';
             roundRect(ctx, bX, bY, bW, bH, 27, true);
             if (perc > 0.01) {
@@ -715,12 +851,16 @@
 
             // Kilometers
             ctx.fillStyle = config.theme === 'light' ? '#0f172a' : '#f8fafc';
-            ctx.font = `900 ${85 * config.wScale}px Inter`; ctx.textAlign = 'left';
+            ctx.font = `${config.kmBold ? '900' : '400'} ${config.kmItalic ? 'italic' : ''} ${config.kmSize * config.wScale}px ${config.kmFont}`;
+            ctx.textAlign = 'left';
             ctx.fillText(`${formatNumber(config.km || 0)} km`, bX, bY + 160);
-            ctx.fillStyle = '#94a3b8'; ctx.font = `700 ${45 * config.wScale}px Inter`; ctx.textAlign = 'right';
+            ctx.fillStyle = '#94a3b8'; 
+            ctx.font = `${config.goalBold ? '700' : '400'} ${config.goalItalic ? 'italic' : ''} ${config.goalSize * config.wScale}px ${config.goalFont}`; 
+            ctx.textAlign = 'right';
             ctx.fillText(`DOEL: ${formatNumber(config.target)}`, bX + bW, bY + 160);
 
-            let bottomY = bY + 255;
+            // Dynamic spacing for bottom elements - adjust based on icon presence
+            let bottomY = config.icon ? bY + 255 : bY + 235;
             ctx.textAlign = 'left';
             if (config.day) {
                 ctx.fillStyle = config.color; ctx.font = `900 ${42 * config.wScale}px Inter`;
@@ -738,15 +878,14 @@
             if (config.weather || config.terrain) {
                 ctx.font = `${50 * config.wScale}px Arial`;
                 ctx.textAlign = 'right';
-                ctx.fillText(`${config.weather} ${config.terrain}`, bX + bW, bY + 250);
+                const weatherY = config.icon ? bY + 250 : bY + 230;
+                ctx.fillText(`${config.weather} ${config.terrain}`, bX + bW, weatherY);
             }
 
             if (config.showLogo) {
                 const lS = 110 * config.wScale; const lX = wX + wW - lS - 60; const lY = wY + wH - lS - 60;
-                if (config.logoType === 'fightcancer') {
-                    ctx.fillStyle = '#e11d48'; ctx.beginPath(); roundRect(ctx, lX, lY, lS, lS, 20, true);
-                    ctx.fillStyle = 'white'; ctx.font = `bold ${26 * config.wScale}px Inter`; ctx.textAlign = 'center';
-                    ctx.fillText('FIGHT', lX + lS/2, lY + lS/2 - 5); ctx.fillText('CANCER', lX + lS/2, lY + lS/2 + 22);
+                if (config.logoType === 'fightcancer' && config.fightCancerLogoImg) {
+                    ctx.drawImage(config.fightCancerLogoImg, lX, lY, lS, lS);
                 } else if (config.logoType === 'custom' && config.customLogoImg) {
                     ctx.drawImage(config.customLogoImg, lX, lY, lS, lS);
                 }
