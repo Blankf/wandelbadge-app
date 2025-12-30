@@ -688,11 +688,11 @@
         posSlider.addEventListener('input', (e) => { config.yPos = parseInt(e.target.value); updatePosLabel(config.yPos); draw(); saveToCache(); });
         yearSizeSlider.addEventListener('input', (e) => { config.yearSize = parseInt(e.target.value); yearSizeLabel.innerText = `${config.yearSize}px`; draw(); saveToCache(); });
         titleSizeSlider.addEventListener('input', (e) => { config.titleSize = parseInt(e.target.value); titleSizeLabel.innerText = `${config.titleSize}px`; draw(); saveToCache(); });
-        
+
         const iconSizeSlider = document.getElementById('iconSizeSlider');
         const iconSizeLabel = document.getElementById('iconSizeLabel');
         iconSizeSlider.addEventListener('input', (e) => { config.iconSize = parseInt(e.target.value); iconSizeLabel.innerText = `${config.iconSize}px`; draw(); saveToCache(); });
-        
+
         const goalSizeSlider = document.getElementById('goalSizeSlider');
         const goalSizeLabel = document.getElementById('goalSizeLabel');
         goalSizeSlider.addEventListener('input', (e) => { config.goalSize = parseInt(e.target.value); goalSizeLabel.innerText = `${config.goalSize}px`; draw(); saveToCache(); });
@@ -838,9 +838,9 @@
             }
 
             // Bar - position dynamically based on icon presence
-            const bX = wX + (80 * config.wScale); 
+            const bX = wX + (80 * config.wScale);
             const bY = config.icon ? wY + 310 : wY + 240;
-            const bW = wW - (160 * config.wScale); 
+            const bW = wW - (160 * config.wScale);
             const bH = 55;
             ctx.fillStyle = config.theme === 'light' ? '#f1f5f9' : '#334155';
             roundRect(ctx, bX, bY, bW, bH, 27, true);
@@ -854,8 +854,8 @@
             ctx.font = `${config.kmBold ? '900' : '400'} ${config.kmItalic ? 'italic' : ''} ${config.kmSize * config.wScale}px ${config.kmFont}`;
             ctx.textAlign = 'left';
             ctx.fillText(`${formatNumber(config.km || 0)} km`, bX, bY + 160);
-            ctx.fillStyle = '#94a3b8'; 
-            ctx.font = `${config.goalBold ? '700' : '400'} ${config.goalItalic ? 'italic' : ''} ${config.goalSize * config.wScale}px ${config.goalFont}`; 
+            ctx.fillStyle = '#94a3b8';
+            ctx.font = `${config.goalBold ? '700' : '400'} ${config.goalItalic ? 'italic' : ''} ${config.goalSize * config.wScale}px ${config.goalFont}`;
             ctx.textAlign = 'right';
             ctx.fillText(`DOEL: ${formatNumber(config.target)}`, bX + bW, bY + 160);
 
