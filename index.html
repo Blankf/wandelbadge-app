@@ -758,6 +758,7 @@
         function resetData() {
             localStorage.removeItem(STORAGE_KEY);
             config = JSON.parse(JSON.stringify(DEFAULT_CONFIG));
+            saveToCache(); // Sync the reset to the server
             updateUIFromConfig();
             toggleResetModal(false);
             draw();
