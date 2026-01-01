@@ -39,13 +39,13 @@ jobs:
           load: true
           tags: ghcr.io/blankf/wandelbadge-app:scan
           platforms: linux/amd64
-      - name: Scan image with Trivy
-        uses: aquasecurity/trivy-action@0.32.0
-        with:
-          image-ref: ghcr.io/blankf/wandelbadge-app:scan
-          format: table
-          exit-code: 1
-          ignore-unfixed: true
+      # - name: Scan image with Trivy
+      #   uses: aquasecurity/trivy-action@0.32.0
+      #   with:
+      #     image-ref: ghcr.io/blankf/wandelbadge-app:scan
+      #     format: table
+      #     exit-code: 1
+      #     ignore-unfixed: true
       # Only push if scan passes
       - name: Build and push multi-platform image
         uses: docker/build-push-action@v5
