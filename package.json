@@ -6,8 +6,8 @@
     "dependencies": {
         "express": "^4.21.2",
         "ws": "^8.18.0",
-        "cross-spawn": "7.0.5",
-        "glob": "11.1.0",
-        "brace-expansion": "2.0.2"
+        "cross-spawn": "7.0.6",
+        "glob": "13.0.0",
+        "brace-expansion": "4.0.1"
     }
 }
