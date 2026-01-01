@@ -3,7 +3,6 @@ const http = require('http');
 const WebSocket = require('ws');
 const fs = require('fs');
 const path = require('path');
-const bodyParser = require('body-parser');
 
 const app = express();
 const server = http.createServer(app);
@@ -78,7 +77,7 @@ if (fs.existsSync(CONFIG_FILE)) {
   }
 }
 
-app.use(bodyParser.json({ limit: '50mb' }));
+app.use(express.json({ limit: '50mb' }));
 app.use(express.static(path.join(__dirname)));
 
 app.get('/api/config', (req, res) => {

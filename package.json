@@ -1,0 +1,10 @@
+{
+  "name": "wandelbadge-app",
+  "version": "1.0.0",
+  "description": "Shared state backend for Wandel Tracker",
+  "main": "server.js",
+  "dependencies": {
+    "express": "^4.21.2",
+    "ws": "^8.18.0"
+  }
+}

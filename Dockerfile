@@ -4,9 +4,8 @@ FROM node:20-alpine
 WORKDIR /usr/src/app
 
 # Install app dependencies
-# We don't have a package.json yet, so we'll create one or install directly
-RUN npm init -y && \
-    npm install express ws body-parser
+COPY package.json ./
+RUN npm install && npm cache clean --force
 
 # Copy app source
 COPY index.html ./
