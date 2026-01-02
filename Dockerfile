@@ -1,9 +1,9 @@
-FROM node:20-slim
+# --- Stage 1: Builder ---
+FROM node:20-slim AS builder
 
-# Create app directory
 WORKDIR /usr/src/app
 
-# Install build dependencies for canvas
+# Install build dependencies for canvas compilation
 RUN apt-get update && apt-get install -y \
     build-essential \
     libcairo2-dev \
@@ -11,13 +11,32 @@ RUN apt-get update && apt-get install -y \
     libjpeg-dev \
     libgif-dev \
     librsvg2-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install app dependencies (compiled native modules will be here)
+COPY package.json ./
+RUN npm install && npm cache clean --force
+
+# --- Stage 2: Runner ---
+FROM node:20-slim
+
+WORKDIR /usr/src/app
+
+# Install ONLY runtime shared libraries and fonts
+RUN apt-get update && apt-get install -y \
+    libcairo2 \
+    libpango-1.0-0 \
+    libpangocairo-1.0-0 \
+    libjpeg62-turbo \
+    libgif7 \
+    librsvg2-2 \
     fonts-inter \
     fonts-noto-color-emoji \
     && rm -rf /var/lib/apt/lists/*
 
-# Install app dependencies
+# Copy compiled node_modules from builder
+COPY --from=builder /usr/src/app/node_modules ./node_modules
 COPY package.json ./
-RUN npm install && npm cache clean --force
 
 # Copy app source
 COPY index.html ./
