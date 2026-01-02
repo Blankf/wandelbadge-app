@@ -161,7 +161,7 @@
     <div id="resetModal">
         <div class="bg-white p-8 rounded-3xl max-w-sm w-full mx-4 shadow-2xl border border-slate-100">
             <h2 class="text-xl font-black mb-2 text-slate-900">Start over?</h2>
-            <p class="text-slate-500 text-sm mb-6">Dit wist alle kilometers, stappen en stijlen uit je browsergeheugen.
+            <p class="text-slate-500 text-sm mb-6">Dit wist alle kilometers, stappen en stijlen van de server.
             </p>
             <div class="flex gap-3">
                 <button onclick="toggleResetModal(false)"
@@ -609,8 +609,6 @@
         const heightSlider = document.getElementById('heightSlider');
         const posSlider = document.getElementById('posSlider');
 
-        const STORAGE_KEY = 'wandelbadge_config_v1';
-
         // Debounce function for performance optimization
         function debounce(func, wait) {
             let timeout;
@@ -675,55 +673,65 @@
         canvas.height = 1920;
 
         let socket;
+        let reconnectAttempts = 0;
+        const MAX_RECONNECT_DELAY = 30000; // 30 seconds
+        const INITIAL_RECONNECT_DELAY = 2000; // 2 seconds
+
         function initWebSocket() {
             const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
             socket = new WebSocket(`${protocol}//${window.location.host}`);
 
+            socket.onopen = () => {
+                console.log('WebSocket connected');
+                reconnectAttempts = 0; // Reset on successful connection
+            };
+
             socket.onmessage = (event) => {
-                const payload = JSON.parse(event.data);
-                if (payload.type === 'INIT_CONFIG' || payload.type === 'UPDATE_CONFIG') {
-                    // Start of migration logic
-                    if (payload.type === 'INIT_CONFIG' && payload.isDefault) {
-                        const saved = localStorage.getItem(STORAGE_KEY);
-                        if (saved) {
-                            config = { ...config, ...JSON.parse(saved) };
-                            saveToCache(); // Push existing local data to the fresh server
-                            updateUIFromConfig();
-                            draw();
-                            return;
+                try {
+                    const payload = JSON.parse(event.data);
+                    if (payload.type === 'INIT_CONFIG' || payload.type === 'UPDATE_CONFIG') {
+                        // Prevent echoing exactly what we already have
+                        const currentString = JSON.stringify({ ...config, bgImage: null, customLogoImg: null, fightCancerLogoImg: null });
+                        const newString = JSON.stringify({ ...config, ...payload.data, bgImage: null, customLogoImg: null, fightCancerLogoImg: null });
+                        if (currentString === newString) return;
+
+                        const fightCancerLogoImgBackup = config.fightCancerLogoImg;
+                        const bgImageBackup = config.bgImage;
+                        const customLogoImgBackup = config.customLogoImg;
+
+                        config = { ...config, ...payload.data };
+
+                        config.fightCancerLogoImg = fightCancerLogoImgBackup;
+                        config.bgImage = bgImageBackup;
+                        config.customLogoImg = customLogoImgBackup;
+
+                        // Reload custom logo if it changed in base64
+                        if (config.customLogoBase64 && (!customLogoImgBackup || customLogoImgBackup.src !== config.customLogoBase64)) {
+                            const img = new Image();
+                            img.onload = () => { config.customLogoImg = img; draw(); };
+                            img.src = config.customLogoBase64;
                         }
+
+                        updateUIFromConfig();
+                        draw();
+                    } else if (payload.type === 'ERROR') {
+                        console.error('Server error:', payload.message);
                     }
-
-                    // Prevent echoing exactly what we already have
-                    const currentString = JSON.stringify({ ...config, bgImage: null, customLogoImg: null, fightCancerLogoImg: null });
-                    const newString = JSON.stringify({ ...config, ...payload.data, bgImage: null, customLogoImg: null, fightCancerLogoImg: null });
-                    if (currentString === newString) return;
-
-                    const fightCancerLogoImgBackup = config.fightCancerLogoImg;
-                    const bgImageBackup = config.bgImage;
-                    const customLogoImgBackup = config.customLogoImg;
-
-                    config = { ...config, ...payload.data };
-
-                    config.fightCancerLogoImg = fightCancerLogoImgBackup;
-                    config.bgImage = bgImageBackup;
-                    config.customLogoImg = customLogoImgBackup;
-
-                    // Reload custom logo if it changed in base64
-                    if (config.customLogoBase64 && (!customLogoImgBackup || customLogoImgBackup.src !== config.customLogoBase64)) {
-                        const img = new Image();
-                        img.onload = () => { config.customLogoImg = img; draw(); };
-                        img.src = config.customLogoBase64;
-                    }
-
-                    updateUIFromConfig();
-                    draw();
+                } catch (err) {
+                    console.error('Error parsing WebSocket message:', err, event.data);
                 }
             };
 
             socket.onclose = () => {
-                console.log('WebSocket connection closed. Reconnecting...');
-                setTimeout(initWebSocket, 2000);
+                reconnectAttempts++;
+                const delay = Math.min(INITIAL_RECONNECT_DELAY * Math.pow(2, reconnectAttempts - 1), MAX_RECONNECT_DELAY);
+                console.log(`WebSocket connection closed. Reconnecting in ${delay}ms (attempt ${reconnectAttempts})...`);
+                setTimeout(initWebSocket, delay);
+            };
+
+            socket.onerror = (error) => {
+                console.error('WebSocket error:', error);
+                socket.close();
             };
         }
 
@@ -733,30 +741,15 @@
             delete toSave.bgImage;
             delete toSave.customLogoImg;
             delete toSave.fightCancerLogoImg;
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(toSave));
 
             if (socket && socket.readyState === WebSocket.OPEN) {
                 socket.send(JSON.stringify({ type: 'SET_CONFIG', data: toSave }));
             }
         }
 
-        function loadFromCache() {
-            const saved = localStorage.getItem(STORAGE_KEY);
-            if (saved) {
-                const parsed = JSON.parse(saved);
-                const fightCancerLogoImgBackup = config.fightCancerLogoImg;
-                config = { ...config, ...parsed };
-                config.fightCancerLogoImg = fightCancerLogoImgBackup;
-                updateUIFromConfig();
-            } else {
-                updateUIFromConfig();
-            }
-        }
-
         function toggleResetModal(show) { resetModal.style.display = show ? 'flex' : 'none'; }
 
         function resetData() {
-            localStorage.removeItem(STORAGE_KEY);
             config = JSON.parse(JSON.stringify(DEFAULT_CONFIG));
             saveToCache(); // Sync the reset to the server
             updateUIFromConfig();
@@ -901,27 +894,28 @@
             document.getElementById('btn-' + tab).classList.add('active');
         }
 
-        // Create debounced versions for text inputs
+        // Create debounced versions for text inputs and sliders
         const debouncedDraw = debounce(() => { draw(); saveToCache(); }, 150);
+        const debouncedSaveToCache = debounce(() => { saveToCache(); }, 300);
 
-        // Sliders & Inputs (sliders don't use debounce for immediate feedback)
-        widthSlider.addEventListener('input', (e) => { config.wScale = e.target.value / 100; document.getElementById('widthLabel').innerText = `${e.target.value}%`; draw(); saveToCache(); });
-        heightSlider.addEventListener('input', (e) => { config.hScale = e.target.value / 100; document.getElementById('heightLabel').innerText = `${e.target.value}%`; draw(); saveToCache(); });
-        posSlider.addEventListener('input', (e) => { config.yPos = parseInt(e.target.value); updatePosLabel(config.yPos); draw(); saveToCache(); });
-        yearSizeSlider.addEventListener('input', (e) => { config.yearSize = parseInt(e.target.value); yearSizeLabel.innerText = `${config.yearSize}px`; draw(); saveToCache(); });
-        titleSizeSlider.addEventListener('input', (e) => { config.titleSize = parseInt(e.target.value); titleSizeLabel.innerText = `${config.titleSize}px`; draw(); saveToCache(); });
+        // Sliders use debounced save but immediate draw for smooth feedback
+        widthSlider.addEventListener('input', (e) => { config.wScale = e.target.value / 100; document.getElementById('widthLabel').innerText = `${e.target.value}%`; draw(); debouncedSaveToCache(); });
+        heightSlider.addEventListener('input', (e) => { config.hScale = e.target.value / 100; document.getElementById('heightLabel').innerText = `${e.target.value}%`; draw(); debouncedSaveToCache(); });
+        posSlider.addEventListener('input', (e) => { config.yPos = parseInt(e.target.value); updatePosLabel(config.yPos); draw(); debouncedSaveToCache(); });
+        yearSizeSlider.addEventListener('input', (e) => { config.yearSize = parseInt(e.target.value); yearSizeLabel.innerText = `${config.yearSize}px`; draw(); debouncedSaveToCache(); });
+        titleSizeSlider.addEventListener('input', (e) => { config.titleSize = parseInt(e.target.value); titleSizeLabel.innerText = `${config.titleSize}px`; draw(); debouncedSaveToCache(); });
 
         const iconSizeSlider = document.getElementById('iconSizeSlider');
         const iconSizeLabel = document.getElementById('iconSizeLabel');
-        iconSizeSlider.addEventListener('input', (e) => { config.iconSize = parseInt(e.target.value); iconSizeLabel.innerText = `${config.iconSize}px`; draw(); saveToCache(); });
+        iconSizeSlider.addEventListener('input', (e) => { config.iconSize = parseInt(e.target.value); iconSizeLabel.innerText = `${config.iconSize}px`; draw(); debouncedSaveToCache(); });
 
         const goalSizeSlider = document.getElementById('goalSizeSlider');
         const goalSizeLabel = document.getElementById('goalSizeLabel');
-        goalSizeSlider.addEventListener('input', (e) => { config.goalSize = parseInt(e.target.value); goalSizeLabel.innerText = `${config.goalSize}px`; draw(); saveToCache(); });
+        goalSizeSlider.addEventListener('input', (e) => { config.goalSize = parseInt(e.target.value); goalSizeLabel.innerText = `${config.goalSize}px`; draw(); debouncedSaveToCache(); });
 
         const kmSizeSlider = document.getElementById('kmSizeSlider');
         const kmSizeLabel = document.getElementById('kmSizeLabel');
-        kmSizeSlider.addEventListener('input', (e) => { config.kmSize = parseInt(e.target.value); kmSizeLabel.innerText = `${config.kmSize}px`; draw(); saveToCache(); });
+        kmSizeSlider.addEventListener('input', (e) => { config.kmSize = parseInt(e.target.value); kmSizeLabel.innerText = `${config.kmSize}px`; draw(); debouncedSaveToCache(); });
 
         const kmFontSelect = document.getElementById('kmFontSelect');
         kmFontSelect.addEventListener('change', (e) => { config.kmFont = e.target.value; draw(); saveToCache(); });
@@ -938,15 +932,25 @@
         showYearInput.addEventListener('change', (e) => { config.showYear = e.target.checked; draw(); saveToCache(); });
         showTitleInput.addEventListener('change', (e) => { config.showTitle = e.target.checked; draw(); saveToCache(); });
         titleCheckInput.addEventListener('change', (e) => { config.titleCheck = e.target.checked; draw(); saveToCache(); });
-        opacitySlider.addEventListener('input', (e) => { config.opacity = e.target.value / 100; document.getElementById('opacityLabel').innerText = `${e.target.value}%`; draw(); saveToCache(); });
+        opacitySlider.addEventListener('input', (e) => { config.opacity = e.target.value / 100; document.getElementById('opacityLabel').innerText = `${e.target.value}%`; draw(); debouncedSaveToCache(); });
 
         bgUpload.addEventListener('change', (e) => {
             const file = e.target.files[0];
             if (!file) return;
+            
+            // Validate file type
             if (!file.type.startsWith('image/')) {
                 alert('Selecteer een geldig afbeeldingsbestand.');
                 return;
             }
+            
+            // Validate file size (max 10MB for background images)
+            const MAX_BG_SIZE = 10 * 1024 * 1024; // 10MB
+            if (file.size > MAX_BG_SIZE) {
+                alert('Achtergrondafbeelding is te groot. Maximale grootte is 10MB.');
+                return;
+            }
+            
             const reader = new FileReader();
             reader.onload = (ev) => {
                 const img = new Image();
@@ -961,10 +965,20 @@
         logoUpload.addEventListener('change', (e) => {
             const file = e.target.files[0];
             if (!file) return;
+            
+            // Validate file type
             if (!file.type.startsWith('image/')) {
                 alert('Selecteer een geldig afbeeldingsbestand.');
                 return;
             }
+            
+            // Validate file size (max 5MB for logos - matches server validation)
+            const MAX_LOGO_SIZE = 5 * 1024 * 1024; // 5MB
+            if (file.size > MAX_LOGO_SIZE) {
+                alert('Logo is te groot. Maximale grootte is 5MB.');
+                return;
+            }
+            
             const reader = new FileReader();
             reader.onload = (ev) => {
                 const img = new Image();
@@ -1132,7 +1146,6 @@
 
         // Initial load
         window.addEventListener('load', () => {
-            loadFromCache(); // Load local data first as fallback
             initWebSocket();
             const fightCancerLogo = new Image();
             fightCancerLogo.onload = () => {

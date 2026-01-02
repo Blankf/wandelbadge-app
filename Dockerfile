@@ -13,8 +13,10 @@ COPY fight_cancer_logo.png ./
 COPY server.js ./
 
 # Create data directory for persistence
-RUN mkdir data
+RUN mkdir data && chown -R node:node /usr/src/app
 
-EXPOSE 80
+EXPOSE 3000
+
+USER node
 
 CMD ["node", "server.js"]
