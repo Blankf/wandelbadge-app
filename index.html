@@ -742,6 +742,11 @@
             delete toSave.customLogoImg;
             delete toSave.fightCancerLogoImg;
 
+            // Include background image as base64 for SSR if available
+            if (config.bgImage && config.bgImage.src.startsWith('data:image/')) {
+                toSave.bgImageBase64 = config.bgImage.src;
+            }
+
             if (socket && socket.readyState === WebSocket.OPEN) {
                 socket.send(JSON.stringify({ type: 'SET_CONFIG', data: toSave }));
             }
@@ -923,7 +928,14 @@
         document.querySelectorAll('input:not([type="file"]):not([type="range"]):not([type="checkbox"])').forEach(input => {
             input.addEventListener('input', (e) => {
                 const key = e.target.id.replace('Input', '');
-                config[key] = e.target.value;
+                let val = e.target.value;
+
+                // Parse numbers for numeric inputs
+                if (e.target.type === 'number') {
+                    val = val === '' ? 0 : parseFloat(val);
+                }
+
+                config[key] = val;
                 debouncedDraw();
             });
         });
@@ -937,20 +949,20 @@
         bgUpload.addEventListener('change', (e) => {
             const file = e.target.files[0];
             if (!file) return;
-            
+
             // Validate file type
             if (!file.type.startsWith('image/')) {
                 alert('Selecteer een geldig afbeeldingsbestand.');
                 return;
             }
-            
+
             // Validate file size (max 10MB for background images)
             const MAX_BG_SIZE = 10 * 1024 * 1024; // 10MB
             if (file.size > MAX_BG_SIZE) {
                 alert('Achtergrondafbeelding is te groot. Maximale grootte is 10MB.');
                 return;
             }
-            
+
             const reader = new FileReader();
             reader.onload = (ev) => {
                 const img = new Image();
@@ -965,20 +977,20 @@
         logoUpload.addEventListener('change', (e) => {
             const file = e.target.files[0];
             if (!file) return;
-            
+
             // Validate file type
             if (!file.type.startsWith('image/')) {
                 alert('Selecteer een geldig afbeeldingsbestand.');
                 return;
             }
-            
+
             // Validate file size (max 5MB for logos - matches server validation)
             const MAX_LOGO_SIZE = 5 * 1024 * 1024; // 5MB
             if (file.size > MAX_LOGO_SIZE) {
                 alert('Logo is te groot. Maximale grootte is 5MB.');
                 return;
             }
-            
+
             const reader = new FileReader();
             reader.onload = (ev) => {
                 const img = new Image();

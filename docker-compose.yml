@@ -6,7 +6,7 @@ services:
     ports:
       - "7000:3000"
     volumes:
-      - wandel-data:/usr/src/app/data
+      - /home/blankf/work/personal/wandelapp/data:/usr/src/app/data
     restart: always
 
 volumes:
