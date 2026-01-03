@@ -392,6 +392,27 @@
                                     LOGO</button>
                             </div>
                             <input type="file" id="logoUpload" accept="image/*">
+
+                            <div class="pt-2 border-t border-emerald-100 space-y-3">
+                                <label class="text-xs font-bold text-emerald-700 uppercase">Logo Positie</label>
+                                <div class="space-y-3">
+                                    <div class="flex justify-between items-center">
+                                        <label
+                                            class="text-xs font-bold text-emerald-600/70 uppercase">Horizontaal</label>
+                                        <span id="logoXLabel" class="text-xs font-bold text-emerald-600">0px</span>
+                                    </div>
+                                    <input type="range" id="logoXSlider" min="-300" max="300" value="0"
+                                        class="w-full rounded-lg appearance-none cursor-pointer accent-emerald-600">
+                                </div>
+                                <div class="space-y-3">
+                                    <div class="flex justify-between items-center">
+                                        <label class="text-xs font-bold text-emerald-600/70 uppercase">Verticaal</label>
+                                        <span id="logoYLabel" class="text-xs font-bold text-emerald-600">0px</span>
+                                    </div>
+                                    <input type="range" id="logoYSlider" min="-300" max="300" value="0"
+                                        class="w-full rounded-lg appearance-none cursor-pointer accent-emerald-600">
+                                </div>
+                            </div>
                         </div>
                     </div>
 
@@ -428,6 +449,25 @@
                                         Doorzichtigheid</label><span id="opacityLabel"
                                         class="text-xs font-bold text-emerald-600">90%</span></div>
                                 <input type="range" id="opacitySlider" min="0" max="100" value="90"
+                                    class="w-full rounded-lg appearance-none cursor-pointer">
+                            </div>
+                        </div>
+
+                        <!-- Badge Positie -->
+                        <div class="space-y-4 p-4 bg-slate-50 rounded-2xl border border-slate-100">
+                            <label class="text-xs font-bold text-slate-500 uppercase">100% Badge Positie</label>
+                            <div class="space-y-3">
+                                <div class="flex justify-between items-center"><label
+                                        class="text-xs font-bold text-slate-400 uppercase">Horizontaal</label><span
+                                        id="badgeXLabel" class="text-xs font-bold text-emerald-600">0px</span></div>
+                                <input type="range" id="badgeXSlider" min="-300" max="300" value="0"
+                                    class="w-full rounded-lg appearance-none cursor-pointer">
+                            </div>
+                            <div class="space-y-3">
+                                <div class="flex justify-between items-center"><label
+                                        class="text-xs font-bold text-slate-400 uppercase">Verticaal</label><span
+                                        id="badgeYLabel" class="text-xs font-bold text-emerald-600">0px</span></div>
+                                <input type="range" id="badgeYSlider" min="-300" max="300" value="0"
                                     class="w-full rounded-lg appearance-none cursor-pointer">
                             </div>
                         </div>
@@ -664,7 +704,13 @@
             terrain: '',
             wScale: 1.0,
             hScale: 0.9,
-            yPos: 1300
+            wScale: 1.0,
+            hScale: 0.9,
+            yPos: 1300,
+            badgeOffsetX: 0,
+            badgeOffsetY: 0,
+            logoOffsetX: 0,
+            logoOffsetY: 0
         };
 
         let config = JSON.parse(JSON.stringify(DEFAULT_CONFIG));
@@ -793,7 +839,20 @@
             document.getElementById('heightLabel').innerText = `${Math.round(config.hScale * 100)}%`;
 
             updateVal('posSlider', config.yPos);
+            updateVal('posSlider', config.yPos);
             updatePosLabel(config.yPos);
+
+            updateVal('badgeXSlider', config.badgeOffsetX || 0);
+            document.getElementById('badgeXLabel').innerText = `${config.badgeOffsetX || 0}px`;
+
+            updateVal('badgeYSlider', config.badgeOffsetY || 0);
+            document.getElementById('badgeYLabel').innerText = `${config.badgeOffsetY || 0}px`;
+
+            updateVal('logoXSlider', config.logoOffsetX || 0);
+            document.getElementById('logoXLabel').innerText = `${config.logoOffsetX || 0}px`;
+
+            updateVal('logoYSlider', config.logoOffsetY || 0);
+            document.getElementById('logoYLabel').innerText = `${config.logoOffsetY || 0}px`;
 
             updateVal('yearSizeSlider', config.yearSize);
             document.getElementById('yearSizeLabel').innerText = `${config.yearSize}px`;
@@ -907,6 +966,18 @@
         widthSlider.addEventListener('input', (e) => { config.wScale = e.target.value / 100; document.getElementById('widthLabel').innerText = `${e.target.value}%`; draw(); debouncedSaveToCache(); });
         heightSlider.addEventListener('input', (e) => { config.hScale = e.target.value / 100; document.getElementById('heightLabel').innerText = `${e.target.value}%`; draw(); debouncedSaveToCache(); });
         posSlider.addEventListener('input', (e) => { config.yPos = parseInt(e.target.value); updatePosLabel(config.yPos); draw(); debouncedSaveToCache(); });
+
+
+        const badgeXSlider = document.getElementById('badgeXSlider');
+        const badgeYSlider = document.getElementById('badgeYSlider');
+        badgeXSlider.addEventListener('input', (e) => { config.badgeOffsetX = parseInt(e.target.value); document.getElementById('badgeXLabel').innerText = `${config.badgeOffsetX}px`; draw(); debouncedSaveToCache(); });
+        badgeYSlider.addEventListener('input', (e) => { config.badgeOffsetY = parseInt(e.target.value); document.getElementById('badgeYLabel').innerText = `${config.badgeOffsetY}px`; draw(); debouncedSaveToCache(); });
+
+        const logoXSlider = document.getElementById('logoXSlider');
+        const logoYSlider = document.getElementById('logoYSlider');
+        logoXSlider.addEventListener('input', (e) => { config.logoOffsetX = parseInt(e.target.value); document.getElementById('logoXLabel').innerText = `${config.logoOffsetX}px`; draw(); debouncedSaveToCache(); });
+        logoYSlider.addEventListener('input', (e) => { config.logoOffsetY = parseInt(e.target.value); document.getElementById('logoYLabel').innerText = `${config.logoOffsetY}px`; draw(); debouncedSaveToCache(); });
+
         yearSizeSlider.addEventListener('input', (e) => { config.yearSize = parseInt(e.target.value); yearSizeLabel.innerText = `${config.yearSize}px`; draw(); debouncedSaveToCache(); });
         titleSizeSlider.addEventListener('input', (e) => { config.titleSize = parseInt(e.target.value); titleSizeLabel.innerText = `${config.titleSize}px`; draw(); debouncedSaveToCache(); });
 
@@ -1044,11 +1115,14 @@
 
             // Badge
             const badgeRadius = 95 * config.wScale;
+            const badgeX = wX + wW - 60 + (config.badgeOffsetX || 0) * config.wScale;
+            const badgeY = wY + 60 + (config.badgeOffsetY || 0) * config.wScale;
+
             ctx.fillStyle = config.color;
-            ctx.beginPath(); ctx.arc(wX + wW - 60, wY + 60, badgeRadius, 0, Math.PI * 2); ctx.fill();
+            ctx.beginPath(); ctx.arc(badgeX, badgeY, badgeRadius, 0, Math.PI * 2); ctx.fill();
             ctx.fillStyle = 'white'; ctx.font = `900 ${52 * config.wScale}px Inter`; ctx.textAlign = 'center';
-            ctx.fillText(`${Math.round(perc * 100)}%`, wX + wW - 60, wY + 65);
-            ctx.font = `700 ${20 * config.wScale}px Inter`; ctx.fillText('KLAAR', wX + wW - 60, wY + 105);
+            ctx.fillText(`${Math.round(perc * 100)}%`, badgeX, badgeY + 5);
+            ctx.font = `700 ${20 * config.wScale}px Inter`; ctx.fillText('KLAAR', badgeX, badgeY + 45);
 
             // Dynamic Y positioning based on icon presence
             let contentStartY = config.icon ? wY + 130 : wY + 60;
@@ -1131,7 +1205,10 @@
             }
 
             if (config.showLogo) {
-                const lS = 110 * config.wScale; const lX = wX + wW - lS - 60; const lY = wY + wH - lS - 60;
+                const lS = 110 * config.wScale;
+                const lX = wX + wW - lS - 60 + (config.logoOffsetX || 0) * config.wScale;
+                const lY = wY + wH - lS - 60 + (config.logoOffsetY || 0) * config.wScale;
+
                 if (config.logoType === 'fightcancer' && config.fightCancerLogoImg) {
                     ctx.drawImage(config.fightCancerLogoImg, lX, lY, lS, lS);
                 } else if (config.logoType === 'custom' && config.customLogoImg) {

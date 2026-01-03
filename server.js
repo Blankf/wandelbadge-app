@@ -94,7 +94,11 @@ function validateConfig(data) {
     customLogoBase64: (v) => v === null || (typeof v === 'string' && v.length <= 5000000 && v.startsWith('data:image/')),
     bgImage: (v) => v === null,
     customLogoImg: (v) => v === null,
-    fightCancerLogoImg: (v) => v === null
+    fightCancerLogoImg: (v) => v === null,
+    badgeOffsetX: (v) => typeof v === 'number',
+    badgeOffsetY: (v) => typeof v === 'number',
+    logoOffsetX: (v) => typeof v === 'number',
+    logoOffsetY: (v) => typeof v === 'number'
   };
 
   for (const key in data) {
@@ -211,16 +215,19 @@ async function renderBadge(config) {
 
   // Badge Circular
   const badgeRadius = 95 * wScale;
+  const badgeX = wX + wW - 60 + (config.badgeOffsetX || 0) * wScale;
+  const badgeY = wY + 60 + (config.badgeOffsetY || 0) * wScale;
+
   ctx.fillStyle = config.color;
   ctx.beginPath();
-  ctx.arc(wX + wW - 60, wY + 60, badgeRadius, 0, Math.PI * 2);
+  ctx.arc(badgeX, badgeY, badgeRadius, 0, Math.PI * 2);
   ctx.fill();
   ctx.fillStyle = 'white';
   ctx.font = `900 ${52 * wScale}px Inter`;
   ctx.textAlign = 'center';
-  ctx.fillText(`${Math.round(perc * 100)}%`, wX + wW - 60, wY + 65);
+  ctx.fillText(`${Math.round(perc * 100)}%`, badgeX, badgeY + 5);
   ctx.font = `700 ${20 * wScale}px Inter`;
-  ctx.fillText('KLAAR', wX + wW - 60, wY + 105);
+  ctx.fillText('KLAAR', badgeX, badgeY + 45);
 
   let contentStartY = config.icon ? wY + 130 : wY + 60;
 
@@ -319,8 +326,8 @@ async function renderBadge(config) {
   if (config.showLogo) {
     let logoImg = null;
     const lS = 110 * wScale;
-    const lX = wX + wW - lS - 60;
-    const lY = wY + wH - lS - 60;
+    const lX = wX + wW - lS - 60 + (config.logoOffsetX || 0) * wScale;
+    const lY = wY + wH - lS - 60 + (config.logoOffsetY || 0) * wScale;
 
     try {
       if (config.logoType === 'fightcancer') {
@@ -400,7 +407,13 @@ const DEFAULT_CONFIG = {
   terrain: '',
   wScale: 1.0,
   hScale: 0.9,
-  yPos: 1300
+  wScale: 1.0,
+  hScale: 0.9,
+  yPos: 1300,
+  badgeOffsetX: 0,
+  badgeOffsetY: 0,
+  logoOffsetX: 0,
+  logoOffsetY: 0
 };
 
 let currentConfig = DEFAULT_CONFIG;
