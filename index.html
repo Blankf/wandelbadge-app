@@ -793,6 +793,10 @@
                 toSave.bgImageBase64 = config.bgImage.src;
             }
 
+            // Ensure numeric values are numbers
+            if (typeof toSave.km === 'string') toSave.km = parseFloat(toSave.km) || 0;
+            if (typeof toSave.target === 'string') toSave.target = parseFloat(toSave.target) || 2026;
+
             if (socket && socket.readyState === WebSocket.OPEN) {
                 socket.send(JSON.stringify({ type: 'SET_CONFIG', data: toSave }));
             }

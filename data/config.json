@@ -12,7 +12,7 @@
   "yearItalic": false,
   "yearSize": 148,
   "showYear": true,
-  "km": "5",
+  "km": 5,
   "kmFont": "Inter",
   "kmSize": 82,
   "kmBold": true,
@@ -33,10 +33,17 @@
   "showLogo": true,
   "logoType": "fightcancer",
   "customLogoBase64": null,
-  "bgImageBase64": null,
+  "bgImage": null,
+  "customLogoImg": null,
+  "fightCancerLogoImg": null,
   "weather": "",
   "terrain": "",
   "wScale": 0.96,
   "hScale": 0.75,
-  "yPos": 1300
+  "yPos": 1300,
+  "badgeOffsetX": 72,
+  "badgeOffsetY": -76,
+  "logoOffsetX": 27,
+  "logoOffsetY": 24,
+  "bgImageBase64": null
 }
