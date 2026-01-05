@@ -98,7 +98,8 @@ function validateConfig(data) {
     badgeOffsetX: (v) => typeof v === 'number',
     badgeOffsetY: (v) => typeof v === 'number',
     logoOffsetX: (v) => typeof v === 'number',
-    logoOffsetY: (v) => typeof v === 'number'
+    logoOffsetY: (v) => typeof v === 'number',
+    autoDay: (v) => typeof v === 'boolean'
   };
 
   for (const key in data) {
@@ -413,7 +414,8 @@ const DEFAULT_CONFIG = {
   badgeOffsetX: 0,
   badgeOffsetY: 0,
   logoOffsetX: 0,
-  logoOffsetY: 0
+  logoOffsetY: 0,
+  autoDay: true
 };
 
 let currentConfig = DEFAULT_CONFIG;

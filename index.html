@@ -212,9 +212,16 @@
                         </div>
                         <div class="grid grid-cols-2 gap-4">
                             <div class="space-y-1">
-                                <label class="text-xs font-bold text-slate-400 uppercase">Dag van uitdaging</label>
+                                <div class="flex justify-between items-center">
+                                    <label class="text-xs font-bold text-slate-400 uppercase">Dag van uitdaging</label>
+                                    <div class="flex items-center gap-1">
+                                        <span class="text-[10px] font-bold text-slate-400 uppercase">Auto</span>
+                                        <input type="checkbox" id="autoDayInput" checked
+                                            class="w-4 h-4 accent-emerald-600">
+                                    </div>
+                                </div>
                                 <input type="number" id="dayInput" placeholder="Bijv. 12"
-                                    class="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-emerald-500 transition-all">
+                                    class="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-emerald-500 transition-all disabled:opacity-50 disabled:cursor-not-allowed">
                             </div>
                             <div class="space-y-1">
                                 <label class="text-xs font-bold text-slate-400 uppercase">Aantal stappen</label>
@@ -648,6 +655,16 @@
         const widthSlider = document.getElementById('widthSlider');
         const heightSlider = document.getElementById('heightSlider');
         const posSlider = document.getElementById('posSlider');
+        const autoDayInput = document.getElementById('autoDayInput');
+        const dayInput = document.getElementById('dayInput');
+
+        function calculateDayOfYear() {
+            const now = new Date();
+            const start = new Date(now.getFullYear(), 0, 0);
+            const diff = (now - start) + ((start.getTimezoneOffset() - now.getTimezoneOffset()) * 60 * 1000);
+            const oneDay = 1000 * 60 * 60 * 24;
+            return Math.floor(diff / oneDay);
+        }
 
         // Debounce function for performance optimization
         function debounce(func, wait) {
@@ -710,7 +727,8 @@
             badgeOffsetX: 0,
             badgeOffsetY: 0,
             logoOffsetX: 0,
-            logoOffsetY: 0
+            logoOffsetY: 0,
+            autoDay: true
         };
 
         let config = JSON.parse(JSON.stringify(DEFAULT_CONFIG));
@@ -823,7 +841,29 @@
 
             updateVal('kmInput', config.km);
             updateVal('targetInput', config.target || 2026);
-            updateVal('dayInput', config.day || '');
+            updateVal('targetInput', config.target || 2026);
+
+            // Auto Day Logic
+            const autoDay = config.autoDay !== undefined ? config.autoDay : true;
+            updateVal('autoDayInput', autoDay);
+
+            if (autoDay) {
+                const calculatedDay = calculateDayOfYear();
+                if (config.day !== calculatedDay) {
+                    config.day = calculatedDay;
+                    // Avoid infinite loop if called from setConfig, but here we just update UI
+                    // However, we want to ensure the calculated day is saved if it wasn't already.
+                    // But strictly speaking updateUIFromConfig is for UI sync. 
+                    // Let's just update the input and disable it.
+                }
+                updateVal('dayInput', calculatedDay);
+                document.getElementById('dayInput').disabled = true;
+            } else {
+                updateVal('dayInput', config.day || '');
+                document.getElementById('dayInput').disabled = false;
+            }
+
+            updateVal('stepsInput', config.steps || '');
             updateVal('stepsInput', config.steps || '');
             updateVal('titleInput', config.title);
             updateVal('yearTextInput', config.yearText);
@@ -1018,6 +1058,21 @@
         showLogoInput.addEventListener('change', (e) => { config.showLogo = e.target.checked; draw(); saveToCache(); });
         showYearInput.addEventListener('change', (e) => { config.showYear = e.target.checked; draw(); saveToCache(); });
         showTitleInput.addEventListener('change', (e) => { config.showTitle = e.target.checked; draw(); saveToCache(); });
+
+        autoDayInput.addEventListener('change', (e) => {
+            config.autoDay = e.target.checked;
+            if (config.autoDay) {
+                config.day = calculateDayOfYear();
+                document.getElementById('dayInput').disabled = true;
+                // Force update UI for day input specifically
+                document.getElementById('dayInput').value = config.day;
+            } else {
+                document.getElementById('dayInput').disabled = false;
+            }
+            draw();
+            saveToCache();
+        });
+
         titleCheckInput.addEventListener('change', (e) => { config.titleCheck = e.target.checked; draw(); saveToCache(); });
         opacitySlider.addEventListener('input', (e) => { config.opacity = e.target.value / 100; document.getElementById('opacityLabel').innerText = `${e.target.value}%`; draw(); debouncedSaveToCache(); });
 
