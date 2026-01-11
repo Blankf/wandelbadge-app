@@ -5,6 +5,11 @@ const fs = require('fs');
 const path = require('path');
 const rateLimit = require('express-rate-limit');
 const { createCanvas, loadImage, registerFont } = require('canvas');
+const cheerio = require('cheerio');
+
+// Scraper cache to avoid excessive requests
+const scraperCache = new Map();
+const SCRAPER_CACHE_TTL = 5 * 60 * 1000; // 5 minutes
 
 const app = express();
 const server = http.createServer(app);
@@ -477,6 +482,123 @@ app.post('/api/config', async (req, res) => {
   } catch (err) {
     console.error('Invalid config:', err.message);
     res.status(400).json({ error: err.message });
+  }
+});
+
+// Scraper endpoint for Home Assistant integration
+app.get('/api/scrape', async (req, res) => {
+  try {
+    const { url } = req.query;
+
+    if (!url) {
+      return res.status(400).json({ error: 'URL parameter is required' });
+    }
+
+    // Basic URL validation
+    try {
+      new URL(url);
+    } catch {
+      return res.status(400).json({ error: 'Invalid URL format' });
+    }
+
+    // Check cache first
+    const cachedData = scraperCache.get(url);
+    if (cachedData && (Date.now() - cachedData.timestamp) < SCRAPER_CACHE_TTL) {
+      return res.json({ ...cachedData.data, cached: true });
+    }
+
+    // Fetch the page
+    const response = await fetch(url, {
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (compatible; WandelApp/1.0; +https://github.com/wandelapp)',
+        'Accept': 'text/html,application/xhtml+xml',
+        'Accept-Language': 'nl-NL,nl;q=0.9,en;q=0.8'
+      }
+    });
+
+    if (!response.ok) {
+      return res.status(502).json({ error: `Failed to fetch page: ${response.status}` });
+    }
+
+    const html = await response.text();
+    const $ = cheerio.load(html);
+
+    // Extract data from the Fight Cancer page structure
+    const pageTitle = $('h1').first().text().trim() || $('title').text().trim();
+
+    // Look for Euro amounts in the page
+    // Fight Cancer shows amounts like "€1.361" and "€2.026"
+    const euroPattern = /€\s*([\d.,]+)/g;
+    const amounts = [];
+
+    // Search in common containers for fundraiser data
+    $('h3, h4, .amount, .raised, .goal, [class*="amount"], [class*="raised"], [class*="goal"]').each((_, el) => {
+      const text = $(el).text();
+      let match;
+      while ((match = euroPattern.exec(text)) !== null) {
+        // Parse the amount (Dutch format: 1.361 = 1361)
+        const amountStr = match[1].replace(/\./g, '').replace(',', '.');
+        const amount = parseFloat(amountStr);
+        if (!isNaN(amount) && amount > 0) {
+          amounts.push({
+            value: amount,
+            formatted: match[0],
+            context: text.substring(0, 100)
+          });
+        }
+      }
+    });
+
+    // Also search in page text for pattern near "Opgehaald" or "streefbedrag"
+    const fullText = $('body').text();
+    let raisedAmount = null;
+    let goalAmount = null;
+
+    // Find amount near "Opgehaald" (Raised)
+    const raisedMatch = fullText.match(/Opgehaald[\s\S]{0,50}€\s*([\d.,]+)/i);
+    if (raisedMatch) {
+      raisedAmount = parseFloat(raisedMatch[1].replace(/\./g, '').replace(',', '.'));
+    }
+
+    // Find amount near "streefbedrag" (Goal)
+    const goalMatch = fullText.match(/streefbedrag[\s\S]{0,50}€\s*([\d.,]+)/i);
+    if (goalMatch) {
+      goalAmount = parseFloat(goalMatch[1].replace(/\./g, '').replace(',', '.'));
+    }
+
+    // If specific matches weren't found, use the first two amounts found
+    if (raisedAmount === null && amounts.length > 0) {
+      raisedAmount = amounts[0].value;
+    }
+    if (goalAmount === null && amounts.length > 1) {
+      goalAmount = amounts[1].value;
+    }
+
+    // Calculate percentage
+    const percentage = (raisedAmount && goalAmount && goalAmount > 0)
+      ? Math.round((raisedAmount / goalAmount) * 100)
+      : null;
+
+    const result = {
+      raised: raisedAmount,
+      raised_formatted: raisedAmount ? `€${raisedAmount.toLocaleString('nl-NL')}` : null,
+      goal: goalAmount,
+      goal_formatted: goalAmount ? `€${goalAmount.toLocaleString('nl-NL')}` : null,
+      percentage: percentage,
+      title: pageTitle,
+      url: url,
+      all_amounts: amounts,
+      last_updated: new Date().toISOString(),
+      cached: false
+    };
+
+    // Cache the result
+    scraperCache.set(url, { data: result, timestamp: Date.now() });
+
+    res.json(result);
+  } catch (err) {
+    console.error('Scraper error:', err.message);
+    res.status(500).json({ error: `Scraping failed: ${err.message}` });
   }
 });
 

@@ -194,6 +194,8 @@
                             class="tab-btn flex-none px-6 py-3 transition-all">Tekst & Stijl</button>
                         <button onclick="switchTab('style')" id="btn-style"
                             class="tab-btn flex-none px-6 py-3 transition-all">Vormgeving</button>
+                        <button onclick="switchTab('scraper')" id="btn-scraper"
+                            class="tab-btn flex-none px-6 py-3 transition-all">🏠 HA</button>
                     </div>
 
                     <!-- TAB: DATA -->
@@ -579,6 +581,100 @@
                                         class="flex-1 py-2 text-xs font-bold uppercase rounded-md text-slate-400 transition-all">Donker</button>
                                 </div>
                             </div>
+                        </div>
+                    </div>
+
+                    <!-- TAB: SCRAPER (Home Assistant Integration) -->
+                    <div id="tab-scraper" class="tab-content space-y-6">
+                        <div class="p-4 bg-blue-50 rounded-2xl border border-blue-100 space-y-4">
+                            <div class="flex items-center gap-2">
+                                <span class="text-2xl">🏠</span>
+                                <label class="text-sm font-bold text-blue-700 uppercase tracking-tighter">Home Assistant
+                                    Integratie</label>
+                            </div>
+                            <p class="text-xs text-blue-600">Test een fundraiser URL en krijg de API endpoint voor Home
+                                Assistant REST sensor.</p>
+
+                            <div class="space-y-2">
+                                <label class="text-xs font-bold text-blue-500 uppercase">Fundraiser URL</label>
+                                <input type="url" id="scraperUrlInput"
+                                    placeholder="https://www.fightcancer.nl/fundraisers/..."
+                                    class="w-full px-4 py-3 bg-white border border-blue-200 rounded-xl outline-none focus:ring-2 focus:ring-blue-500 transition-all text-sm">
+                            </div>
+
+                            <button onclick="testScraper()" id="scraperTestBtn"
+                                class="w-full bg-blue-600 text-white font-bold py-3 rounded-xl shadow-lg hover:bg-blue-700 transition-all flex items-center justify-center gap-2">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none"
+                                    viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                        d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                                </svg>
+                                Test URL
+                            </button>
+                        </div>
+
+                        <!-- Scraper Results -->
+                        <div id="scraperResults" class="hidden space-y-4">
+                            <div class="p-4 bg-emerald-50 rounded-2xl border border-emerald-100 space-y-3">
+                                <label class="text-xs font-bold text-emerald-700 uppercase">Gevonden Data</label>
+                                <div class="grid grid-cols-2 gap-4">
+                                    <div class="p-4 bg-white rounded-xl border border-emerald-200">
+                                        <p class="text-xs text-emerald-500 uppercase font-bold">Opgehaald</p>
+                                        <p id="scraperRaised" class="text-2xl font-black text-emerald-700">-</p>
+                                    </div>
+                                    <div class="p-4 bg-white rounded-xl border border-emerald-200">
+                                        <p class="text-xs text-emerald-500 uppercase font-bold">Doel</p>
+                                        <p id="scraperGoal" class="text-2xl font-black text-emerald-700">-</p>
+                                    </div>
+                                </div>
+                                <div class="p-4 bg-white rounded-xl border border-emerald-200">
+                                    <p class="text-xs text-emerald-500 uppercase font-bold">Percentage</p>
+                                    <div class="flex items-center gap-4">
+                                        <p id="scraperPercentage" class="text-3xl font-black text-emerald-700">-%</p>
+                                        <div class="flex-1 bg-emerald-100 rounded-full h-4 overflow-hidden">
+                                            <div id="scraperProgressBar"
+                                                class="bg-emerald-500 h-full rounded-full transition-all"
+                                                style="width: 0%"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="p-4 bg-slate-50 rounded-2xl border border-slate-100 space-y-3">
+                                <label class="text-xs font-bold text-slate-500 uppercase">API Endpoint voor Home
+                                    Assistant</label>
+                                <div class="relative">
+                                    <input type="text" id="scraperApiUrl" readonly
+                                        class="w-full px-4 py-3 pr-24 bg-white border border-slate-200 rounded-xl text-xs font-mono text-slate-600">
+                                    <button onclick="copyApiUrl()"
+                                        class="absolute right-2 top-1/2 -translate-y-1/2 px-3 py-1.5 bg-slate-900 text-white text-xs font-bold rounded-lg hover:bg-emerald-600 transition-all">
+                                        Kopieer
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div class="p-4 bg-amber-50 rounded-2xl border border-amber-100 space-y-3">
+                                <label class="text-xs font-bold text-amber-700 uppercase">Home Assistant YAML
+                                    Voorbeeld</label>
+                                <pre id="scraperYaml"
+                                    class="p-3 bg-white rounded-xl border border-amber-200 text-xs font-mono text-slate-700 overflow-x-auto whitespace-pre"></pre>
+                                <button onclick="copyYaml()"
+                                    class="w-full bg-amber-500 text-white font-bold py-2 rounded-xl hover:bg-amber-600 transition-all text-sm">
+                                    Kopieer YAML
+                                </button>
+                            </div>
+
+                            <div class="p-4 bg-slate-50 rounded-2xl border border-slate-100 space-y-3">
+                                <label class="text-xs font-bold text-slate-500 uppercase">Ruwe JSON Response</label>
+                                <pre id="scraperJson"
+                                    class="p-3 bg-white rounded-xl border border-slate-200 text-xs font-mono text-slate-600 overflow-x-auto max-h-48"></pre>
+                            </div>
+                        </div>
+
+                        <!-- Scraper Error -->
+                        <div id="scraperError" class="hidden p-4 bg-red-50 rounded-2xl border border-red-200">
+                            <p class="text-sm font-bold text-red-700">Fout bij ophalen</p>
+                            <p id="scraperErrorMsg" class="text-xs text-red-600 mt-1"></p>
                         </div>
                     </div>
 
@@ -1000,6 +1096,94 @@
             document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
             document.getElementById('tab-' + tab).classList.add('active');
             document.getElementById('btn-' + tab).classList.add('active');
+        }
+
+        // Scraper functions for Home Assistant integration
+        let lastScraperData = null;
+
+        async function testScraper() {
+            const urlInput = document.getElementById('scraperUrlInput');
+            const resultsDiv = document.getElementById('scraperResults');
+            const errorDiv = document.getElementById('scraperError');
+            const testBtn = document.getElementById('scraperTestBtn');
+
+            const url = urlInput.value.trim();
+            if (!url) {
+                errorDiv.classList.remove('hidden');
+                document.getElementById('scraperErrorMsg').textContent = 'Voer een URL in om te testen.';
+                resultsDiv.classList.add('hidden');
+                return;
+            }
+
+            // Show loading state
+            testBtn.disabled = true;
+            testBtn.innerHTML = '<svg class="animate-spin h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> Laden...';
+
+            try {
+                const apiUrl = `${window.location.origin}/api/scrape?url=${encodeURIComponent(url)}`;
+                const response = await fetch(apiUrl);
+                const data = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(data.error || 'Onbekende fout');
+                }
+
+                lastScraperData = data;
+
+                // Update UI with results
+                document.getElementById('scraperRaised').textContent = data.raised_formatted || '-';
+                document.getElementById('scraperGoal').textContent = data.goal_formatted || '-';
+                document.getElementById('scraperPercentage').textContent = data.percentage !== null ? `${data.percentage}%` : '-%';
+                document.getElementById('scraperProgressBar').style.width = `${data.percentage || 0}%`;
+                document.getElementById('scraperApiUrl').value = apiUrl;
+                document.getElementById('scraperJson').textContent = JSON.stringify(data, null, 2);
+
+                // Generate YAML example
+                const yaml = `rest:
+  - resource: "${apiUrl}"
+    scan_interval: 3600
+    sensor:
+      - name: "Fight Cancer Opgehaald"
+        value_template: "{{ value_json.raised }}"
+        unit_of_measurement: "€"
+      - name: "Fight Cancer Doel"
+        value_template: "{{ value_json.goal }}"
+        unit_of_measurement: "€"
+      - name: "Fight Cancer Percentage"
+        value_template: "{{ value_json.percentage }}"
+        unit_of_measurement: "%"`;
+                document.getElementById('scraperYaml').textContent = yaml;
+
+                errorDiv.classList.add('hidden');
+                resultsDiv.classList.remove('hidden');
+            } catch (err) {
+                errorDiv.classList.remove('hidden');
+                document.getElementById('scraperErrorMsg').textContent = err.message;
+                resultsDiv.classList.add('hidden');
+            } finally {
+                testBtn.disabled = false;
+                testBtn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg> Test URL';
+            }
+        }
+
+        function copyApiUrl() {
+            const apiUrl = document.getElementById('scraperApiUrl').value;
+            navigator.clipboard.writeText(apiUrl).then(() => {
+                const btn = event.target;
+                const original = btn.textContent;
+                btn.textContent = '✓ Gekopieerd!';
+                setTimeout(() => { btn.textContent = original; }, 1500);
+            });
+        }
+
+        function copyYaml() {
+            const yaml = document.getElementById('scraperYaml').textContent;
+            navigator.clipboard.writeText(yaml).then(() => {
+                const btn = event.target;
+                const original = btn.textContent;
+                btn.textContent = '✓ Gekopieerd!';
+                setTimeout(() => { btn.textContent = original; }, 1500);
+            });
         }
 
         // Create debounced versions for text inputs and sliders

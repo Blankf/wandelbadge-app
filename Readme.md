@@ -52,7 +52,7 @@ If port 7000 is already in use, modify the port mapping in `docker-compose.yml`:
 
 ```yaml
 ports:
-  - "9000:80"  # Change 9000 to your preferred port
+  - "9000:3000"  # Change 9000 to your preferred port
 ```
 
 ## Data Persistence
