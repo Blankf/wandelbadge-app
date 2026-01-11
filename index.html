@@ -195,7 +195,7 @@
                         <button onclick="switchTab('style')" id="btn-style"
                             class="tab-btn flex-none px-6 py-3 transition-all">Vormgeving</button>
                         <button onclick="switchTab('scraper')" id="btn-scraper"
-                            class="tab-btn flex-none px-6 py-3 transition-all">🏠 HA</button>
+                            class="tab-btn flex-none px-6 py-3 transition-all hidden">🏠 HA</button>
                     </div>
 
                     <!-- TAB: DATA -->
@@ -1479,6 +1479,17 @@
         // Initial load
         window.addEventListener('load', () => {
             initWebSocket();
+
+            // Fetch settings to check if scraper tab should be shown
+            fetch('/api/settings')
+                .then(res => res.json())
+                .then(settings => {
+                    if (settings.enableScraper) {
+                        document.getElementById('btn-scraper').classList.remove('hidden');
+                    }
+                })
+                .catch(err => console.warn('Failed to fetch settings:', err));
+
             const fightCancerLogo = new Image();
             fightCancerLogo.onload = () => {
                 config.fightCancerLogoImg = fightCancerLogo;

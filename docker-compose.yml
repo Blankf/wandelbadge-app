@@ -5,6 +5,8 @@ services:
     image: ghcr.io/blankf/wandelbadge-app:latest
     ports:
       - "7000:3000"
+    environment:
+      - ENABLE_SCRAPER=true  # Set to 'false' to hide the Home Assistant scraper tab
     volumes:
       - /home/blankf/work/personal/wandelapp/data:/usr/src/app/data
     restart: always

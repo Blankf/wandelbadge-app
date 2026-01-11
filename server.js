@@ -18,6 +18,7 @@ const wss = new WebSocket.Server({ server });
 const PORT = process.env.PORT || 3000;
 const DATA_DIR = path.join(__dirname, 'data');
 const CONFIG_FILE = path.join(DATA_DIR, 'config.json');
+const ENABLE_SCRAPER = process.env.ENABLE_SCRAPER !== 'false'; // Enabled by default
 
 // Rate limiter for API endpoints
 const apiLimiter = rateLimit({
@@ -447,6 +448,13 @@ app.get('/api/config', (req, res) => {
   res.json(currentConfig);
 });
 
+// Feature flags endpoint for frontend
+app.get('/api/settings', (req, res) => {
+  res.json({
+    enableScraper: ENABLE_SCRAPER
+  });
+});
+
 app.get('/api/badge.png', async (req, res) => {
   try {
     const buffer = await renderBadge(currentConfig);
@@ -485,7 +493,7 @@ app.post('/api/config', async (req, res) => {
   }
 });
 
-// Scraper endpoint for Home Assistant integration
+// Scraper endpoint for Home Assistant integration (always available, frontend tab controlled by ENABLE_SCRAPER)
 app.get('/api/scrape', async (req, res) => {
   try {
     const { url } = req.query;
