@@ -269,6 +269,14 @@
                                     <input type="range" id="yearSizeSlider" min="50" max="400" value="180"
                                         class="w-full rounded-lg appearance-none cursor-pointer">
                                 </div>
+                                <div class="space-y-1">
+                                    <div class="flex justify-between items-center">
+                                        <label class="text-xs font-bold text-slate-400 uppercase">Verticale Positie</label>
+                                        <span id="yearOffsetYLabel" class="text-xs font-bold text-emerald-600">0px</span>
+                                    </div>
+                                    <input type="range" id="yearOffsetYSlider" min="-300" max="300" value="0"
+                                        class="w-full rounded-lg appearance-none cursor-pointer">
+                                </div>
                             </div>
                         </div>
 
@@ -788,6 +796,7 @@
             yearBold: true,
             yearItalic: false,
             yearSize: 180,
+            yearOffsetY: 0,
             showYear: true,
             km: 25,
             kmFont: 'Inter',
@@ -996,6 +1005,9 @@
 
             updateVal('yearSizeSlider', config.yearSize);
             document.getElementById('yearSizeLabel').innerText = `${config.yearSize}px`;
+
+            updateVal('yearOffsetYSlider', config.yearOffsetY || 0);
+            document.getElementById('yearOffsetYLabel').innerText = `${config.yearOffsetY || 0}px`;
 
             updateVal('titleSizeSlider', config.titleSize);
             document.getElementById('titleSizeLabel').innerText = `${config.titleSize}px`;
@@ -1207,6 +1219,10 @@
         logoYSlider.addEventListener('input', (e) => { config.logoOffsetY = parseInt(e.target.value); document.getElementById('logoYLabel').innerText = `${config.logoOffsetY}px`; draw(); debouncedSaveToCache(); });
 
         yearSizeSlider.addEventListener('input', (e) => { config.yearSize = parseInt(e.target.value); yearSizeLabel.innerText = `${config.yearSize}px`; draw(); debouncedSaveToCache(); });
+
+        const yearOffsetYSlider = document.getElementById('yearOffsetYSlider');
+        yearOffsetYSlider.addEventListener('input', (e) => { config.yearOffsetY = parseInt(e.target.value); document.getElementById('yearOffsetYLabel').innerText = `${config.yearOffsetY}px`; draw(); debouncedSaveToCache(); });
+
         titleSizeSlider.addEventListener('input', (e) => { config.titleSize = parseInt(e.target.value); titleSizeLabel.innerText = `${config.titleSize}px`; draw(); debouncedSaveToCache(); });
 
         const iconSizeSlider = document.getElementById('iconSizeSlider');
@@ -1352,7 +1368,7 @@
                 ctx.font = `${config.yearBold ? '900' : '400'} ${config.yearItalic ? 'italic' : ''} ${config.yearSize * config.wScale}px ${config.yearFont}`;
                 ctx.textAlign = 'center';
                 ctx.shadowBlur = 15; ctx.shadowColor = 'rgba(0,0,0,0.1)';
-                ctx.fillText(config.yearText, canvas.width / 2, wY - 60);
+                ctx.fillText(config.yearText, canvas.width / 2, wY - 60 + (config.yearOffsetY || 0) * config.wScale);
                 ctx.restore();
             }
 

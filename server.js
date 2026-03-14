@@ -105,6 +105,7 @@ function validateConfig(data) {
     badgeOffsetY: (v) => typeof v === 'number',
     logoOffsetX: (v) => typeof v === 'number',
     logoOffsetY: (v) => typeof v === 'number',
+    yearOffsetY: (v) => typeof v === 'number',
     autoDay: (v) => typeof v === 'boolean'
   };
 
@@ -216,7 +217,7 @@ async function renderBadge(config) {
     ctx.fillStyle = config.color;
     ctx.font = `${config.yearBold ? '900' : '400'} ${config.yearItalic ? 'italic' : ''} ${config.yearSize * wScale}px "${yearFont}"`;
     ctx.textAlign = 'center';
-    ctx.fillText(config.yearText, canvas.width / 2, wY - 60);
+    ctx.fillText(config.yearText, canvas.width / 2, wY - 60 + (config.yearOffsetY || 0) * wScale);
     ctx.restore();
   }
 
@@ -385,6 +386,7 @@ const DEFAULT_CONFIG = {
   yearBold: true,
   yearItalic: false,
   yearSize: 180,
+  yearOffsetY: 0,
   showYear: true,
   km: 25,
   kmFont: 'Inter',
